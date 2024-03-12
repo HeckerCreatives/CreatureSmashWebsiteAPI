@@ -29,7 +29,7 @@ exports.register = async (req, res) => {
     })
 
     if (!searchreferral){
-        console.log(`referral id not exist for ${username} referralid: ${referral} Error: ${err}`)
+        console.log(`referral id not exist for ${username} referralid: ${referral}`)
 
         return res.status(400).json({ message: "bad-request", data: "Referral does not exist! Please don't tamper with the url." })
     }
@@ -139,4 +139,25 @@ exports.authlogin = async(req, res) => {
         }
     })
     .catch(err => res.status(400).json({ message: "bad-request1", data: "There's a problem with your account! There's a problem with your account! Please contact customer support for more details." }))
+}
+
+exports.getreferralusername = async (req, res) => {
+    const {id} = req.body
+
+    const user = await Users.findOne({_id: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => {
+
+        console.log(`There's a problem searching user for ${id} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: "There's a problem getting referral, please contact support for more details." })
+    })
+
+    if (!user){
+        console.log(`Referral id does not exist for ${id}`)
+
+        return res.status(400).json({ message: "bad-request", data: "There's a problem getting referral, please contact support for more details." })
+    }
+
+    return res.json({message: "success", data: user.username})
 }
