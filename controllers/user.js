@@ -80,7 +80,7 @@ exports.uploadprofilepicture = async(req, res) => {
         catch(err){
             console.log(`Failed to delete profile picture ${ex.message}`)
 
-            return res.status(400).json({ message: "bad-request", data: "There's a problem uploading your profile picture. Please contact customer support." })
+            return res.status(400).json({ message: "bad-request", data: "There's a problem uploading your creature picture. Please contact customer support." })
         }
     }
 
@@ -89,7 +89,7 @@ exports.uploadprofilepicture = async(req, res) => {
 
         console.log(`There's a problem updating user details for ${username} Error: ${err}`)
 
-        return res.status(400).json({ message: "bad-request", data: "There's a problem uploading your profile picture. Please contact customer support." })
+        return res.status(400).json({ message: "bad-request", data: "There's a problem uploading your creature picture. Please contact customer support." })
     })
 
     return res.json({message: "success"})
