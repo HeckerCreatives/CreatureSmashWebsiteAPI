@@ -124,11 +124,6 @@ exports.authlogin = async(req, res) => {
                     return res.status(500).json({ error: 'Internal Server Error', data: "There's a problem signing in! Please contact customer support for more details! Error 004" });
                 }
 
-                const data = {
-                    token: jwtoken,
-                    datetime: DateTimeServer()
-                }
-
                 res.cookie('sessionToken', jwtoken, { secure: true, sameSite: 'None' } )
                 return res.json({message: "success"})
             })
