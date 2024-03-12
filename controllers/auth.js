@@ -18,23 +18,35 @@ const encrypt = async password => {
 }
 
 exports.register = async (req, res) => {
-    const { username, password, referral, email } = req.query
+    const { username, password, referral, email } = req.body
 
     const user = await Users.findOne({username: { $regex: new RegExp('^' + username + '$', 'i') }})
     .then(data => data)
-    .catch(err => res.status(400).json({ message: "bad-request", data: "There's a problem registering your account. Please try again." }))
+    .catch(err => {
+
+        console.log(`There's a problem searching user for ${username} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: "There's a problem registering your account. Please try again." })
+    })
 
     if (user){
         return res.status(400).json({message: "failed", data: "You already registered this account! Please login if this is yours."})
     }
 
     const player = await Users.create({username: username, password: password, referral: new mongoose.Types.ObjectId(referral), gametoken: "", webtoken: "", bandate: "none", banreason: "", status: "active"})
-    .catch(err => res.status(400).json({ message: "bad-request", data: "There's a problem registering your account. Please try again." }))
+    .catch(err => {
+
+        console.log(`There's a problem creating user for ${username} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: "There's a problem registering your account. Please try again." })
+    })
 
     await Score.create({owner: new mongoose.Types.ObjectId(player._id), amount: 0})
     .catch(async err => {
 
         await Users.findOneAndDelete({_id: new mongoose.Types.ObjectId(player._id)})
+
+        console.log(`There's a problem creating user details for ${player._id} Error: ${err}`)
 
         return res.status(400).json({ message: "bad-request", data: "There's a problem registering your account. Please try again." })
     })
@@ -46,6 +58,8 @@ exports.register = async (req, res) => {
 
         await Score.findOneAndDelete({_id: new mongoose.Types.ObjectId(player._id)})
 
+        console.log(`There's a problem creating user details for ${player._id} Error: ${err}`)
+
         return res.status(400).json({ message: "bad-request", data: "There's a problem registering your account. Please try again." })
     })
 
@@ -55,11 +69,13 @@ exports.register = async (req, res) => {
         await Userwallets.create({owner: new mongoose.Types.ObjectId(player._id), type: data, amount: 0})
         .catch(async err => {
 
-                await Users.findOneAndDelete({_id: new mongoose.Types.ObjectId(player._id)})
+            await Users.findOneAndDelete({_id: new mongoose.Types.ObjectId(player._id)})
 
-                await Score.findOneAndDelete({_id: new mongoose.Types.ObjectId(player._id)})
+            await Score.findOneAndDelete({_id: new mongoose.Types.ObjectId(player._id)})
 
-                await Userdetails.findOneAndDelete({_id: new mongoose.Types.ObjectId(player._id)})
+            await Userdetails.findOneAndDelete({_id: new mongoose.Types.ObjectId(player._id)})
+
+            console.log(`There's a problem creating user wallet for ${player._id} with type ${data} Error: ${err}`)
 
             return res.status(400).json({ message: "bad-request", data: "There's a problem registering your account. Please try again." })
         })
@@ -70,7 +86,7 @@ exports.register = async (req, res) => {
 }
 
 exports.authlogin = async(req, res) => {
-    const { username, password } = req.body;
+    const { username, password } = req.query;
 
     Users.findOne({ username: { $regex: new RegExp('^' + username + '$', 'i') } })
     .then(async user => {
