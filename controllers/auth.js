@@ -142,7 +142,7 @@ exports.authlogin = async(req, res) => {
 }
 
 exports.getreferralusername = async (req, res) => {
-    const {id} = req.body
+    const {id} = req.query
 
     const user = await Users.findOne({_id: new mongoose.Types.ObjectId(id)})
     .then(data => data)
@@ -156,7 +156,7 @@ exports.getreferralusername = async (req, res) => {
     if (!user){
         console.log(`Referral id does not exist for ${id}`)
 
-        return res.status(400).json({ message: "bad-request", data: "There's a problem getting referral, please contact support for more details." })
+        return res.status(400).json({ message: "bad-request", data: "Referral id does not exist, please contact support for more details." })
     }
 
     return res.json({message: "success", data: user.username})
