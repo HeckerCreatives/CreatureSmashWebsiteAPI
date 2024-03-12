@@ -37,14 +37,20 @@ exports.playerwallethistory = async (req, res) => {
 
     const totalPages = Math.ceil(historypages / pageOptions.limit)
 
-    data = {
-        history: {
+    const data = {
+        history: {},
+        pages: totalPages
+    }
+
+    history.forEach(historydata => {
+        const {type, amount, from, _id} = historydata
+
+        data.history[_id] = {
             type: type,
             amount: amount,
             from: from
-        },
-        pages: totalPages
-    }
+        }
+    })
 
     return res.json({message: "success", data: data})
 }
