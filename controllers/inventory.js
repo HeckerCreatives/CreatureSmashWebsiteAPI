@@ -59,9 +59,9 @@ exports.getinventory = async (req, res) => {
 
     const data = {}
 
-    creatures.forEach(datacreatures => {
-        const {type, rank, dailyaccumalted, totalaccumulated}
-    })
+    // creatures.forEach(datacreatures => {
+    //     const {type, rank, dailyaccumalted, totalaccumulated}
+    // })
 
     //  DO QTY
 }
