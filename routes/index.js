@@ -8,6 +8,7 @@ const routers = app => {
     app.use("/unilevel", require("./unilevel"))
     app.use("/inventory", require("./inventory"))
     app.use("/user", require("./user"))
+    app.use("/picuploads", require('./picuploads'))
 }
 
 module.exports = routers

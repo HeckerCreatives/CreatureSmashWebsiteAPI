@@ -28,14 +28,17 @@ exports.protectplayer = async (req, res, next) => {
         .then(data => data)
 
         if (!user){
+            res.clearCookie('sessionToken', { path: '/' })
             return res.status(401).json({ message: 'Unauthorized' });
         }
 
         if (user.status != "active"){
+            res.clearCookie('sessionToken', { path: '/' })
             return res.status(401).json({ message: 'failed', data: `Your account had been ${user.status}! Please contact support for more details.` });
         }
 
         if (decodedToken.token != user.webtoken){
+            res.clearCookie('sessionToken', { path: '/' })
             return res.status(401).json({ message: 'duallogin', data: `Your account had been opened on another device! You will now be logged out.` });
         }
 
