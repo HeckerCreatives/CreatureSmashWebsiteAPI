@@ -11,6 +11,10 @@ exports.playerwallethistory = async (req, res) => {
     };
 
     const history = await Wallethistory.find({owner: new mongoose.Types.ObjectId(id), type: type})
+    .populate({
+        path: "from",
+        select: "username -_id"
+    })
     .skip(pageOptions.page * pageOptions.limit)
     .limit(pageOptions.limit)
     .sort({createdAt: -1})
@@ -34,7 +38,11 @@ exports.playerwallethistory = async (req, res) => {
     const totalPages = Math.ceil(historypages / pageOptions.limit)
 
     data = {
-        history: history,
+        history: {
+            type: type,
+            amount: amount,
+            from: from
+        },
         pages: totalPages
     }
 
