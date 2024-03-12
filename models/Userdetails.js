@@ -26,6 +26,10 @@ const UserdetailsSchema = new mongoose.Schema(
         },
         postalcode: {
             type: String
+        },
+        profilepicture: {
+            type: String,
+            default: ""
         }
     },
     {

@@ -25,7 +25,7 @@ exports.initialize = async (req, res) => {
             return
         })
         
-        await Userdetails.create({email: "", fistname: "", lastname: "", address: "", city: "", country: "", postalcode: ""})
+        await Userdetails.create({email: "", fistname: "", lastname: "", address: "", city: "", country: "", postalcode: "", profilepicture: ""})
         .catch(async err => {
 
             await Users.findOneAndDelete({_id: new mongoose.Types.ObjectId(player._id)})

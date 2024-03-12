@@ -7,6 +7,7 @@ const routers = app => {
     app.use("/wallethistory", require("./wallethistory"))
     app.use("/unilevel", require("./unilevel"))
     app.use("/inventory", require("./inventory"))
+    app.use("/user", require("./user"))
 }
 
 module.exports = routers

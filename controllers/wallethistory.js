@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose");
 const Wallethistory = require("../models/Wallethistory")
 
 exports.playerwallethistory = async (req, res) => {
-    const {id} = req.user
+    const {id, username} = req.user
     const {type, page, limit} = req.query
 
     const pageOptions = {
@@ -17,7 +17,7 @@ exports.playerwallethistory = async (req, res) => {
     .then(data => data)
     .catch(err => {
 
-        console.log(`Failed to get wallet history data for ${data.owner}, wallet type: ${type}, error: ${err}`)
+        console.log(`Failed to get wallet history data for ${username}, wallet type: ${type}, error: ${err}`)
 
         return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
     })
@@ -26,7 +26,7 @@ exports.playerwallethistory = async (req, res) => {
     .then(data => data)
     .catch(err => {
 
-        console.log(`Failed to get wallet history count document data for ${data.owner}, wallet type: ${type}, error: ${err}`)
+        console.log(`Failed to get wallet history count document data for ${username}, wallet type: ${type}, error: ${err}`)
 
         return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
     })

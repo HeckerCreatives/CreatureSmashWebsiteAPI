@@ -20,6 +20,10 @@ const inventoryShema = new mongoose.Schema(
         },
         dailyaccumulated: {
             type: Number
+        },
+        profilepicture: {
+            type: String,
+            default: ""
         }
     },
     {

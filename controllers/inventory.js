@@ -41,7 +41,7 @@ exports.buycreature = async (req, res) => {
     })
 
     if (!exist){
-        await Inventory.create({owner: new mongoose.Types.ObjectId(id), qty: qty, expiration: DateTimeServerExpiration(price.expiration), rank: price.rank, totalaccumulated: 0, dailyaccumulated: 0})
+        await Inventory.create({owner: new mongoose.Types.ObjectId(id), qty: qty, expiration: DateTimeServerExpiration(price.expiration), rank: price.rank, totalaccumulated: 0, dailyaccumulated: 0, profilepicture: ""})
         .catch(err => {
 
             console.log(`Failed to create inventory data for ${username} type: ${type}, error: ${err}`)
