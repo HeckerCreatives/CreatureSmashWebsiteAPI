@@ -13,6 +13,10 @@ exports.getuserdetails = async (req, res) => {
         return res.status(400).json({ message: "bad-request", data: "There's a problem registering your account. Please try again." })
     })
 
+    if (!details){
+        return res.status(400).json({ message: "bad-request", data: "There's a problem with your account! Please contact customer support." })
+    }
+
     const data = {
         email: details.email,
         fistname: details.firstname,

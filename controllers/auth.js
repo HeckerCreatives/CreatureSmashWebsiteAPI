@@ -65,7 +65,7 @@ exports.register = async (req, res) => {
         return res.status(400).json({ message: "bad-request", data: "There's a problem registering your account. Please try again." })
     })
 
-    await Userdetails.create({email: email, fistname: "", lastname: "", address: "", city: "", country: "", postalcode: "", profilepicture: ""})
+    await Userdetails.create({owner: new mongoose.Types.ObjectId(player._id),  email: email, fistname: "", lastname: "", address: "", city: "", country: "", postalcode: "", profilepicture: ""})
     .catch(async err => {
 
         await Users.findOneAndDelete({_id: new mongoose.Types.ObjectId(player._id)})
