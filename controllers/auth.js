@@ -18,18 +18,18 @@ const encrypt = async password => {
 }
 
 exports.register = async (req, res) => {
-    const { username, password, referral, email, referralid } = req.body
+    const { username, password, referral, email } = req.body
 
-    const searchreferral = await Users.findOne({_id: new mongoose.Types.ObjectId(referralid)})
+    const searchreferral = await Users.findOne({_id: new mongoose.Types.ObjectId(referral)})
     .then(data => data)
     .catch(err => {
-        console.log(`There's a problem searching referral for ${username} referralid: ${referralid} Error: ${err}`)
+        console.log(`There's a problem searching referral for ${username} referralid: ${referral} Error: ${err}`)
 
         return res.status(400).json({ message: "bad-request", data: "Referral does not exist! Please don't tamper with the url." })
     })
 
     if (!searchreferral){
-        console.log(`referral id not exist for ${username} referralid: ${referralid} Error: ${err}`)
+        console.log(`referral id not exist for ${username} referralid: ${referral} Error: ${err}`)
 
         return res.status(400).json({ message: "bad-request", data: "Referral does not exist! Please don't tamper with the url." })
     }
