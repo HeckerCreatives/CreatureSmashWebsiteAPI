@@ -18,7 +18,7 @@ const encrypt = async password => {
 }
 
 exports.register = async (req, res) => {
-    const { username, password, referral, email } = req.body
+    const { username, password, referral, email } = req.query
 
     const user = await Users.findOne({username: { $regex: new RegExp('^' + username + '$', 'i') }})
     .then(data => data)

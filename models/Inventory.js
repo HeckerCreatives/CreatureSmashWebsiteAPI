@@ -18,7 +18,7 @@ const inventoryShema = new mongoose.Schema(
         totalaccumulated: {
             type: Number
         },
-        dailyaccumalted: {
+        dailyaccumulated: {
             type: Number
         }
     },
