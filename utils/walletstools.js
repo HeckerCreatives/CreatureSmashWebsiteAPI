@@ -24,7 +24,7 @@ exports.walletbalance = async (type, id) => {
 }
 
 exports.reducewallet = async (type, price, id) => {
-    
+
     await Userwallets.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: type}, {$inc: { amount: -price}})
     .catch(err => {
 
@@ -41,7 +41,7 @@ exports.sendcommissionunilevel = async (commissionAmount, id) => {
     const pipeline = [
         // Match the sender
         {
-            $match: { _id: id },
+            $match: { _id: new mongoose.Types.ObjectId(id) },
         },
         // GraphLookup to recursively traverse the referral chain
         {
@@ -203,6 +203,8 @@ exports.sendcommissionunilevel = async (commissionAmount, id) => {
 
     unilevelresult.forEach(dataresult => {
         const { _id, level, amount } = dataresult
+
+        console.log(dataresult)
 
         historypipeline.push({owner: new mongoose.Types.ObjectId(_id), type: "Buy Unilevel", amount: amount, from: new mongoose.Types.ObjectId(id)})
 
