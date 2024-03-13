@@ -20,12 +20,13 @@ exports.buycreature = async (req, res) => {
     }
 
     const price = creaturedata(type)
+    const finalprice = (price.amount * qty)
 
-    if (wallet < price.amount){
+    if (wallet < finalprice){
         return res.status(401).json({ message: 'failed', data: `You don't have enough funds to buy this creature! Please top up first and try again.` })
     }
 
-    const buy = await reducewallet("fiatbalance", (price.amount * price.qty), id)
+    const buy = await reducewallet("fiatbalance", finalprice, id)
 
     if (buy != "success"){
         return res.status(401).json({ message: 'failed', data: `You don't have enough funds to buy this creature! Please top up first and try again.` })
@@ -40,7 +41,7 @@ exports.buycreature = async (req, res) => {
         return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
     })
 
-    const unilevelrewards = await sendcommissionunilevel((price.amount * price.qty), id)
+    const unilevelrewards = await sendcommissionunilevel(finalprice, id)
 
     if (unilevelrewards != "success"){
         return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })

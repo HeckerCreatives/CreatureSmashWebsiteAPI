@@ -24,10 +24,11 @@ exports.walletbalance = async (type, id) => {
 }
 
 exports.reducewallet = async (type, price, id) => {
+    
     await Userwallets.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), type: type}, {$inc: { amount: -price}})
     .catch(err => {
 
-        console.log(`Failed to reduce wallet data for ${data.owner} type: ${type} price: ${price}, error: ${err}`)
+        console.log(`Failed to reduce wallet data for ${id} type: ${type} price: ${price}, error: ${err}`)
 
         return "failed"
     })
@@ -40,7 +41,7 @@ exports.sendcommissionunilevel = async (commissionAmount, id) => {
     const pipeline = [
         // Match the sender
         {
-            $match: { _id: sender._id },
+            $match: { _id: id },
         },
         // GraphLookup to recursively traverse the referral chain
         {
