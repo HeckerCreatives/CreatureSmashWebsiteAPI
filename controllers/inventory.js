@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose")
 const Inventory = require("../models/Inventory")
 const { creaturedata } = require("../utils/inventorytools")
-const { walletbalance, reducewallet } = require("../utils/walletstools")
+const { walletbalance, reducewallet, sendcommissionunilevel } = require("../utils/walletstools")
 const { DateTimeServerExpiration } = require("../utils/datetimetools")
 const { addanalytics } = require("../utils/analyticstools")
 
@@ -25,7 +25,7 @@ exports.buycreature = async (req, res) => {
         return res.status(401).json({ message: 'failed', data: `You don't have enough funds to buy this creature! Please top up first and try again.` })
     }
 
-    const buy = await reducewallet("fiatbalance", price.amount, id)
+    const buy = await reducewallet("fiatbalance", (price.amount * price.qty), id)
 
     if (buy != "success"){
         return res.status(401).json({ message: 'failed', data: `You don't have enough funds to buy this creature! Please top up first and try again.` })
@@ -37,8 +37,14 @@ exports.buycreature = async (req, res) => {
 
         console.log(`Failed to get inventory data for ${username} type: ${type}, error: ${err}`)
 
-        return "failed"
+        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
     })
+
+    const unilevelrewards = await sendcommissionunilevel((price.amount * price.qty), id)
+
+    if (unilevelrewards != "success"){
+        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
+    }
 
     if (!exist){
         await Inventory.create({owner: new mongoose.Types.ObjectId(id), type: type, qty: qty, expiration: DateTimeServerExpiration(price.expiration), rank: price.rank, totalaccumulated: 0, dailyaccumulated: 0, qty: qty})
@@ -46,7 +52,7 @@ exports.buycreature = async (req, res) => {
 
             console.log(`Failed to create inventory data for ${username} type: ${type}, error: ${err}`)
 
-            return "failed"
+            return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
         })
     }
     else{
@@ -55,7 +61,7 @@ exports.buycreature = async (req, res) => {
 
             console.log(`Failed to update inventory data for ${username} type: ${type}, error: ${err}`)
 
-            return "failed"
+            return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
         })
     }
 
@@ -65,7 +71,7 @@ exports.buycreature = async (req, res) => {
 }
 
 exports.getinventory = async (req, res) => {
-    const {id} = req.user
+    const {id, username} = req.user
     const {rank, page, limit} = req.query
 
     const pageOptions = {
@@ -80,18 +86,18 @@ exports.getinventory = async (req, res) => {
     .then(data => data)
     .catch(err => {
 
-        console.log(`Failed to get inventory data for ${id} rank: ${rank}, error: ${err}`)
+        console.log(`Failed to get inventory data for ${username}, error: ${err}`)
 
-        return "failed"
+        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
     })
 
     const totalPages = await Inventory.countDocuments({owner: id, rank: rank})
     .then(data => data)
     .catch(err => {
 
-        console.log(`Failed to count inventory data for ${id} rank: ${rank}, error: ${err}`)
+        console.log(`Failed to count documents inventory data for ${username}, error: ${err}`)
 
-        return "failed"
+        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
     })
 
     const pages = Math.ceil(totalPages / pageOptions.limit)
