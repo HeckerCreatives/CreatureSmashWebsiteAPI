@@ -11,7 +11,7 @@ const app = express();
 const {initialize} = require("./initialization/serverinitialize")
 
 const corsConfig = {
-    origin: [""],
+    origin: ["http://127.0.0.1:51264", "http://127.0.0.1:51264/"],
     methods: ["GET", "POST", "PUT", "DELETE"], // List only` available methods
     credentials: true, // Must be set to true
     allowedHeaders: ["Origin", "Content-Type", "X-Requested-With", "Accept", "Authorization"],
