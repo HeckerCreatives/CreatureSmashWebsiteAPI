@@ -89,7 +89,7 @@ exports.creaturedata = (type) => {
             expiration: 30,
             percentage: 2,
             name: "Gold Yeti",
-            rank: "silver"
+            rank: "gold"
         },
         g_minotaur: {
             amount: 302000,

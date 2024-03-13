@@ -78,9 +78,7 @@ exports.uploadprofilepicture = async(req, res) => {
             fs.unlinkSync(details.profilepicture)
         }
         catch(err){
-            console.log(`Failed to delete profile picture ${ex.message}`)
-
-            return res.status(400).json({ message: "bad-request", data: "There's a problem uploading your creature picture. Please contact customer support." })
+            console.log(`Failed to delete profile picture ${err}`)
         }
     }
 
