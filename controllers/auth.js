@@ -156,3 +156,8 @@ exports.getreferralusername = async (req, res) => {
 
     return res.json({message: "success", data: user.username})
 }
+
+exports.logout = async (req, res) => {
+    res.clearCookie('sessionToken', { path: '/' })
+    return res.json({message: "success"})
+}
