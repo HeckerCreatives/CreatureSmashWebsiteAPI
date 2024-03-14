@@ -2,6 +2,12 @@ const { default: mongoose } = require("mongoose")
 const Userdetails = require("../models/Userdetails")
 const fs = require("fs")
 
+exports.getreferrallink = async (req, res) => {
+    const {id} = req.user
+
+    return res.json({message: "success", data: id})
+}
+
 exports.getuserdetails = async (req, res) => {
     const {id, username} = req.user
 
