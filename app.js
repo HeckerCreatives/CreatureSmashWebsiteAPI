@@ -11,8 +11,8 @@ const app = express();
 const {initialize} = require("./initialization/serverinitialize")
 
 const corsConfig = {
-    // origin: ["http://127.0.0.1:51264", "http://127.0.0.1:51264/"],
-    origin: ["http://localhost:3000/", "http://localhost:3000"],
+    origin: ["http://127.0.0.1:51264", "http://127.0.0.1:51264/", "https://creaturesmashwebsite.onrender.com","https://creaturesmashwebsite.onrender.com/"],
+    // origin: ["http://localhost:3000/", "http://localhost:3000"],
     methods: ["GET", "POST", "PUT", "DELETE"], // List only` available methods
     credentials: true, // Must be set to true
     allowedHeaders: ["Origin", "Content-Type", "X-Requested-With", "Accept", "Authorization"],
