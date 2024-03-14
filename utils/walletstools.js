@@ -204,9 +204,9 @@ exports.sendcommissionunilevel = async (commissionAmount, id) => {
     unilevelresult.forEach(dataresult => {
         const { _id, level, amount } = dataresult
 
-        historypipeline.push({owner: new mongoose.Types.ObjectId(_id), type: "Buy Unilevel", amount: amount, from: new mongoose.Types.ObjectId(id)})
+        historypipeline.push({owner: new mongoose.Types.ObjectId(_id), type: "commissionbalance", amount: amount, from: new mongoose.Types.ObjectId(id)})
 
-        analyticspipeline.push({owner: new mongoose.Types.ObjectId(_id), type: "Buy Unilevel", description: `Unilevel from ${id} to ${_id} with commission total amount of ${commissionAmount} and commission amount of ${amount}`, amount: amount})
+        analyticspipeline.push({owner: new mongoose.Types.ObjectId(_id), type: "commissionbalance", description: `Unilevel from ${id} to ${_id} with commission total amount of ${commissionAmount} and commission amount of ${amount}`, amount: amount})
     })
 
     const bulkOperationUnilvl = unilevelresult.map(({_id, amount }) => ({

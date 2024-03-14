@@ -25,7 +25,7 @@ exports.playerwallethistory = async (req, res) => {
 
         return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
     })
-
+    
     const historypages = await Wallethistory.countDocuments({owner: new mongoose.Types.ObjectId(id), type: type})
     .then(data => data)
     .catch(err => {
@@ -36,7 +36,7 @@ exports.playerwallethistory = async (req, res) => {
     })
 
     const totalPages = Math.ceil(historypages / pageOptions.limit)
-
+    
     const data = {
         history: {},
         pages: totalPages
