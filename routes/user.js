@@ -1,6 +1,6 @@
 const router = require("express").Router()
-const { getuserdetails, uploadprofilepicture, updateuserprofile, getreferrallink } = require("../controllers/user")
-const { protectplayer } = require("../middleware/middleware")
+const { getuserdetails, uploadprofilepicture, updateuserprofile, getreferrallink, banunbanuser } = require("../controllers/user")
+const { protectplayer, protectsuperadmin } = require("../middleware/middleware")
 const pictureupload = require("../middleware/picuploads")
 
 const uploadimg = pictureupload.single("file")
@@ -9,6 +9,7 @@ router
     .get("/getuserdetails", protectplayer, getuserdetails)
     .get("/getreferrallink", protectplayer, getreferrallink)
     .post("/updateuserprofile", protectplayer, updateuserprofile)
+    .post("/banunbanuser", protectsuperadmin, banunbanuser)
     .post("/uploadprofilepicture", protectplayer, function (req, res, next){
         uploadimg(req, res, function(err) {
             if (err){

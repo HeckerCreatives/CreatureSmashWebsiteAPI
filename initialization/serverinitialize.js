@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose")
 const Users = require("../models/Users")
+const Staffusers = require("../models/Staffusers")
 const Userwallets = require("../models/Userwallets")
 const Userdetails = require("../models/Userdetails")
 const Score = require("../models/Score")
@@ -78,6 +79,21 @@ exports.initialize = async (req, res) => {
 
                 return
             })
+        })
+    }
+
+    const staff = await Staffusers.find()
+    .then(data => data)
+    .catch(err => {
+        console.log(`There's a problem getting staff user data ${err}`)
+        return
+    })
+
+    if (staff.length <= 0){
+        await Staffusers.create({username: "creaturesmashsuperadmin", password: "e7FNO0EWgW11", webtoken: "", status: "active", auth: "superadmin"})
+        .catch(err => {
+            console.log(`There's a problem creating staff user data ${err}`)
+            return
         })
     }
 

@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose")
 const Userdetails = require("../models/Userdetails")
+const Users = require("../models/Users")
 const fs = require("fs")
 
 exports.getreferrallink = async (req, res) => {
@@ -95,6 +96,21 @@ exports.uploadprofilepicture = async(req, res) => {
         console.log(`There's a problem updating user details for ${username} Error: ${err}`)
 
         return res.status(400).json({ message: "bad-request", data: "There's a problem uploading your creature picture. Please contact customer support." })
+    })
+
+    return res.json({message: "success"})
+}
+
+exports.banunbanuser = async (req, res) => {
+    const {id, username} = req.user
+    const {status, userid} = req.body
+
+    await Users.findOneAndUpdate({_id: new mongoose.Types.ObjectId(userid)}, {status: status})
+    .catch(err => {
+
+        console.log(`There's a problem banning or unbanning user for ${username}, player: ${userid}, status: ${status} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: "There's a problem getting your user details. Please contact customer support." })
     })
 
     return res.json({message: "success"})
