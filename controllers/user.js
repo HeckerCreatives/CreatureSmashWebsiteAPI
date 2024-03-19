@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose")
 const Userdetails = require("../models/Userdetails")
 const Users = require("../models/Users")
 const fs = require("fs")
+const bcrypt = require('bcrypt');
 
 exports.getreferrallink = async (req, res) => {
     const {id} = req.user
@@ -38,6 +39,48 @@ exports.getuserdetails = async (req, res) => {
     }
 
     return res.json({message: "success", data: data})
+}
+
+exports.changepassworduser = async (req, res) => {
+    const {id, username} = req.user
+    const {password} = req.body
+    
+    if (password == ""){
+        return res.status(400).json({ message: "failed", data: "Please complete the form first before saving!" })
+    }
+
+    const hashPassword = bcrypt.hashSync(password, 10)
+
+    await Users.findOneAndUpdate({_id: new mongoose.Types.ObjectId(id)}, {password: hashPassword})
+    .catch(err => {
+
+        console.log(`There's a problem changing password user for ${username} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: "There's a problem changing your password. Please contact customer support." })
+    })
+
+    return res.json({message: "success"})
+}
+
+exports.changepassworduserforadmin = async (req, res) => {
+    const {id, username} = req.user
+    const {playerid, password} = req.body
+    
+    if (password == ""){
+        return res.status(400).json({ message: "failed", data: "Please complete the form first before saving!" })
+    }
+
+    const hashPassword = bcrypt.hashSync(password, 10)
+
+    await Users.findOneAndUpdate({_id: new mongoose.Types.ObjectId(playerid)}, {password: hashPassword})
+    .catch(err => {
+
+        console.log(`There's a problem changing password user for ${username}, player: ${playerid} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: "There's a problem changing password. Please contact customer support." })
+    })
+
+    return res.json({message: "success"})
 }
 
 exports.updateuserprofile = async (req, res) => {
