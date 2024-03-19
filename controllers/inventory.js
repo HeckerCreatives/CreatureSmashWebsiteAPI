@@ -153,17 +153,21 @@ exports.getplayerinventoryforadmin = async (req, res) => {
 
     const pages = Math.ceil(totalPages / pageOptions.limit)
 
-    const data = {}
+    const data = {
+        bronze: [],
+        silver: [],
+        gold: []
+    }
 
     creatures.forEach(datacreatures => {
         const {type, rank, dailyaccumulated, totalaccumulated, qty} = datacreatures
-
-        data[type] = {
-            rank: rank,
+        
+        data[rank].push({
+            type: type,
             qty: qty,
             dailyaccumulated: dailyaccumulated,
             totalaccumulated: totalaccumulated
-        }
+        })
     })
 
     data["totalPages"] = pages
