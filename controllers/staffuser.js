@@ -134,16 +134,19 @@ exports.getadminlist = async (req, res) => {
     const pages = Math.ceil(totalPages / pageOptions.limit)
 
     const data = {
-        users: {},
+        users: [],
         totalPages: pages
     }
 
     adminlist.forEach(value => {
         const {username, createdAt} = value
 
-        data["users"][username] = {
-            createdAt: createdAt
-        }
+        data["users"].push(
+            {
+                username: username,
+                createdAt: createdAt
+            }
+        )
     });
 
     return res.json({message: "success", data: data})

@@ -101,6 +101,63 @@ exports.uploadprofilepicture = async(req, res) => {
     return res.json({message: "success"})
 }
 
+exports.getplayerlist = async (req, res) => {
+    const {id, username} = req.user
+    const {page, limit} = req.query
+
+    const pageOptions = {
+        page: parseInt(page) || 0,
+        limit: parseInt(limit) || 10
+    };
+
+    const userlistpipeline = [
+        {
+            $facet: {
+                totalCount: [
+                    {
+                        $count: "total"
+                    }
+                ],
+                data: [
+                    {
+                        $lookup: {
+                            from: "userdetails", // Assuming the collection name for UserDetails is "userdetails"
+                            localField: "_id",
+                            foreignField: "owner",
+                            as: "userDetails"
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "users", // Assuming the collection name for Users is "users"
+                            localField: "referral",
+                            foreignField: "_id",
+                            as: "referredUser"
+                        }
+                    },
+                    {
+                        $project: {
+                            username: 1,
+                            email: { $arrayElemAt: ["$userDetails.email", 0] },
+                            referralUsername: { $arrayElemAt: ["$referredUser.username", 0] },
+                            createdAt: 1,
+                            status: 1
+                        }
+                    },
+                    {
+                        $skip: pageOptions.page * pageOptions.limit
+                    },
+                    {
+                        $limit: pageOptions.limit
+                    }
+                ]
+            }
+        }
+    ]
+
+    return res.json({message: "success", data: data})
+}
+
 exports.banunbanuser = async (req, res) => {
     const {id, username} = req.user
     const {status, userid} = req.body
