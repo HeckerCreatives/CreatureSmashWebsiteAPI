@@ -169,10 +169,11 @@ exports.getplayerlist = async (req, res) => {
     }
 
     userlist[0].data.forEach(value => {
-        const {username, status, createdAt, email, referralUsername} = value
+        const {_id, username, status, createdAt, email, referralUsername} = value
 
         data["userlist"].push(
             {
+                id: _id,
                 username: username,
                 email: email,
                 referralUsername: referralUsername,
@@ -198,9 +199,4 @@ exports.banunbanuser = async (req, res) => {
     })
 
     return res.json({message: "success"})
-}
-
-exports.getplayerwalletforadmin = async (req, res) => {
-    // const {id, username} = req.user
-    // const {username} = 
 }

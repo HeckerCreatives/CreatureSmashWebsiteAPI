@@ -139,11 +139,12 @@ exports.getadminlist = async (req, res) => {
     }
 
     adminlist.forEach(value => {
-        const {username, createdAt} = value
+        const {username, status, createdAt} = value
 
         data["users"].push(
             {
                 username: username,
+                status: status,
                 createdAt: createdAt
             }
         )
