@@ -2,6 +2,8 @@ const { default: mongoose } = require("mongoose")
 const Analytics = require("../models/Analytics")
 const Userwallets = require("../models/Userwallets")
 const Users = require("../models/Users")
+const Staffusers = require("../models/Staffusers")
+const bcrypt = require('bcrypt');
 
 exports.getsadashboard = async(req, res) => {
     const {id, username} = req.user
@@ -84,4 +86,86 @@ exports.getsadashboard = async(req, res) => {
     data["payoutgame"] = 0
 
     return res.json({message: "success", data: data})
+}
+
+exports.banunbanuser = async (req, res) => {
+    const {id, username} = req.user
+    const {status, userid} = req.body
+
+    await Staffusers.findOneAndUpdate({_id: new mongoose.Types.ObjectId(userid)}, {status: status})
+    .catch(err => {
+
+        console.log(`There's a problem banning or unbanning user for ${username}, player: ${userid}, status: ${status} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: "There's a problem getting your user details. Please contact customer support." })
+    })
+
+    return res.json({message: "success"})
+}
+
+exports.getadminlist = async (req, res) => {
+    const {id, username} = req.user
+    const {page, limit} = req.query
+
+    const pageOptions = {
+        page: parseInt(page) || 0,
+        limit: parseInt(limit) || 10
+    };
+
+    const adminlist = await Staffusers.find({auth: {$ne: "superadmin"}})
+    .skip(pageOptions.page * pageOptions.limit)
+    .limit(pageOptions.limit)
+    .sort({createdAt: -1})
+    .catch(err => {
+        console.log(`Failed to get admin list data for ${username}, error: ${err}`)
+
+        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
+    })
+
+    const totalPages = await Staffusers.countDocuments({auth: {$ne: "superadmin"}})
+    .then(data => data)
+    .catch(err => {
+
+        console.log(`Failed to count documents staff users data for ${username}, error: ${err}`)
+
+        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
+    })
+
+    const pages = Math.ceil(totalPages / pageOptions.limit)
+
+    const data = {
+        users: {},
+        totalPages: pages
+    }
+
+    adminlist.forEach(value => {
+        const {username, createdAt} = value
+
+        data["users"][username] = {
+            createdAt: createdAt
+        }
+    });
+
+    return res.json({message: "success", data: data})
+}
+
+exports.updateadmin = async (req, res) => {
+    const {id, username} = req.user
+    const {staffusername, password} = req.body
+
+    if (password == ""){
+        return res.status(400).json({ message: "failed", data: "Please complete the form first before saving!" })
+    }
+
+    const hashPassword = bcrypt.hashSync(password, 10)
+
+    await Staffusers.findOneAndUpdate({username: staffusername}, {password: hashPassword})
+    .catch(err => {
+
+        console.log(`There's a problem updating user data for ${staffusername}, admin execution: ${username} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: "There's a problem getting your user details. Please contact customer support." })
+    })
+
+    return res.json({message: "success"})
 }
