@@ -209,6 +209,63 @@ exports.getpayouthistorysuperadmin = async (req, res) => {
     return res.json({message: "success", data: data})
 }
 
+exports.getpayouthistoryadmin = async (req, res) => {
+    const {id, username} = req.user
+    const {type, page, limit} = req.query
+    
+    const pageOptions = {
+        page: parseInt(page) || 0,
+        limit: parseInt(limit) || 10
+    }
+
+    const payoutlist = await Payout.find({type: type, processby: new mongoose.Types.ObjectId(id)})
+    .populate({
+        path: "owner processby",
+        select: "username _id"
+    })
+    .skip(pageOptions.page * pageOptions.limit)
+    .limit(pageOptions.limit)
+    .sort({'createdAt': -1})
+    .then(data => data)
+    .catch(err => {
+
+        console.log(`Failed to get payout list data for ${username}, error: ${err}`)
+
+        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
+    })
+
+    const totalPages = await Payout.countDocuments({type: type, processby: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => {
+
+        console.log(`Failed to count documents Payin data for ${username}, error: ${err}`)
+
+        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
+    })
+
+    const pages = Math.ceil(totalPages / pageOptions.limit)
+
+    const data = {
+        history: [],
+        totalPages: pages
+    }
+    
+    payoutlist.forEach(valuedata => {
+        const {_id, owner, processby, status, value, type} = valuedata
+
+        data.history.push({
+            id: _id,
+            owner: owner,
+            processby: processby != null ? processby : "",
+            status: status,
+            value: value,
+            type: type
+        })
+    })
+
+    return res.json({message: "success", data: data})
+}
+
 exports.processpayout = async (req, res) => {
     const {id, username} = req.user
     const {payoutid, status} = req.body

@@ -115,6 +115,61 @@ exports.getpayinhistorysuperadmin = async (req, res) => {
     return res.json({message: "success", data: data})
 }
 
+exports.getpayinhistoryadmin = async (req, res) => {
+    const {id, username} = req.user
+    const {page, limit} = req.query
+    
+    const pageOptions = {
+        page: parseInt(page) || 0,
+        limit: parseInt(limit) || 10
+    }
+
+    const payinhistory = await Payin.find({processby: new mongoose.Types.ObjectId(id)})
+    .populate({
+        path: "owner processby",
+        select: "username -_id"
+    })
+    .skip(pageOptions.page * pageOptions.limit)
+    .limit(pageOptions.limit)
+    .sort({'createdAt': -1})
+    .then(data => data)
+    .catch(err => {
+
+        console.log(`Failed to get payin list data for ${username}, error: ${err}`)
+
+        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
+    })
+
+    const totalPages = await Payin.countDocuments({processby: new mongoose.Types.ObjectId(id)})
+    .then(data => data)
+    .catch(err => {
+
+        console.log(`Failed to count documents Payin data for ${username}, error: ${err}`)
+
+        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
+    })
+
+    const pages = Math.ceil(totalPages / pageOptions.limit)
+
+    const data = {
+        payinhistory: [],
+        totalPages: pages
+    }
+    
+    payinhistory.forEach(valuedata => {
+        const {owner, processby, status, value} = valuedata
+
+        data.payinhistory.push({
+            owner: owner.username,
+            processby: processby != null ? processby.username : "",
+            status: status,
+            value: value
+        })
+    })
+
+    return res.json({message: "success", data: data})
+}
+
 exports.processpayin = async (req, res) => {
     const {id, username} = req.user
     const {payinid, status} = req.body

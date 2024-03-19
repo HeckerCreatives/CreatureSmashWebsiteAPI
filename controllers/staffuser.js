@@ -2,6 +2,8 @@ const { default: mongoose } = require("mongoose")
 const Analytics = require("../models/Analytics")
 const Userwallets = require("../models/Userwallets")
 const Users = require("../models/Users")
+const Payin = require("../models/Payin")
+const Payout = require("../models/Payout")
 const Staffusers = require("../models/Staffusers")
 const bcrypt = require('bcrypt');
 
@@ -233,6 +235,85 @@ exports.updateadmin = async (req, res) => {
     .catch(err => {
 
         console.log(`There's a problem updating user data for ${staffusername}, admin execution: ${username} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: "There's a problem getting your user details. Please contact customer support." })
+    })
+
+    return res.json({message: "success"})
+}
+
+exports.getadmindashboard = async (req, res) => {
+    const {id, username} = req.user
+
+    const data = {}
+
+    const payinpipeline = [
+        {
+            $match: {
+                processby: new mongoose.Types.ObjectId(id),
+                status: "done"
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: "$amount" }
+            }
+        }
+    ]
+
+    const payin = await Payin.aggregate(payinpipeline)
+    .catch(err => {
+
+        console.log(`There's a problem getting commission and buy aggregate for ${username} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: `There's a problem with the server. Please try again later. Error: ${err}` })
+    })
+
+    data["totalpayin"] = payin.length > 0 ? payin[0].totalAmount : 0
+
+    const payoutpipeline = [
+        {
+            $match: {
+                processby: new mongoose.Types.ObjectId(id),
+                status: "done"
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: "$amount" }
+            }
+        }
+    ]
+
+    const payout = await Payout.aggregate(payinpipeline)
+    .catch(err => {
+
+        console.log(`There's a problem getting commission and buy aggregate for ${username} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: `There's a problem with the server. Please try again later. Error: ${err}` })
+    })
+
+    data["totalpayout"] = payout.length > 0 ? payout[0].totalAmount : 0
+
+    return res.json({message: "success", data: data})
+}
+
+exports.changepass = async (req, res) => {
+    const {id, username} = req.user
+    const {password} = req.body
+
+    if (password == ""){
+        return res.status(400).json({ message: "failed", data: "Please complete the form first before saving!" })
+    }
+
+    const hashPassword = bcrypt.hashSync(password, 10)
+
+    await Staffusers.findOneAndUpdate({username: username}, {password: hashPassword})
+    .catch(err => {
+
+        console.log(`There's a problem updating user data for ${username}, admin execution: ${username} Error: ${err}`)
 
         return res.status(400).json({ message: "bad-request", data: "There's a problem getting your user details. Please contact customer support." })
     })
