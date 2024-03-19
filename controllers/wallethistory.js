@@ -93,19 +93,19 @@ exports.getplayerwallethistoryforadmin = async (req, res) => {
     const totalPages = Math.ceil(historypages / pageOptions.limit)
 
     const data = {
-        history: {},
+        history: [],
         pages: totalPages
     }
 
     history.forEach(historydata => {
         const {type, amount, from, _id, createdAt} = historydata
 
-        data.history[_id] = {
+        data.history.push({
             type: type,
             amount: amount,
             from: from,
             createdAt: createdAt
-        }
+        })
     })
 
     return res.json({message: "success", data: data})
