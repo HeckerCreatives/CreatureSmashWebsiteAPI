@@ -83,7 +83,7 @@ exports.getsadashboard = async(req, res) => {
     const payinpipline = [
         {
             $match: {
-                type: "fiatbalance"
+                type: "payinfiatbalance"
             }
         },
         {
@@ -103,10 +103,53 @@ exports.getsadashboard = async(req, res) => {
 
     data["payin"] = payin.length > 0 ? payin[0].totalAmount : 0
 
+    const payoutgamepipeline = [
+        {
+            $match: {
+                type: "payoutgamebalance"
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: "$amount" }
+            }
+        }
+    ]
+    const payoutgame = await Analytics.aggregate(payoutgamepipeline)
+    .catch(err => {
+
+        console.log(`There's a problem getting payout game aggregate for ${username} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: `There's a problem with the server. Please try again later. Error: ${err}` })
+    })
+
+    data["payoutgame"] = payoutgame.length > 0 ? payoutgame[0].totalAmount : 0
+
+    const payoutcommissionpipeline = [
+        {
+            $match: {
+                type: "payoutcommissionbalance"
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: "$amount" }
+            }
+        }
+    ]
+    const payoutcommission = await Analytics.aggregate(payoutcommissionpipeline)
+    .catch(err => {
+
+        console.log(`There's a problem getting payout commission aggregate for ${username} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: `There's a problem with the server. Please try again later. Error: ${err}` })
+    })
     
-    data["payout"] = 0
-    data["payoutcommission"] = 0
-    data["payoutgame"] = 0
+    data["payoutcommission"] = payoutcommission.length > 0 ? payoutcommission[0].totalAmount : 0
+
+    data["payout"] = parseFloat(data["payoutgame"]) + parseFloat(data["payoutcommission"])
 
     return res.json({message: "success", data: data})
 }

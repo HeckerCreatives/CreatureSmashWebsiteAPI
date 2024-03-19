@@ -162,7 +162,7 @@ exports.processpayin = async (req, res) => {
             return res.status(401).json({ message: 'failed', data: `There's a problem saving payin in wallet history. Please contact customer support for more details` })
         }
 
-        const analyticsadd = await addanalytics(playerid, "fiatbalance", `Add balance to user ${playerid} with a value of ${payinvalue} processed by ${username}`, payinvalue)
+        const analyticsadd = await addanalytics(playerid, "payinfiatbalance", `Add balance to user ${playerid} with a value of ${payinvalue} processed by ${username}`, payinvalue)
 
         if (analyticsadd != "success"){
             return res.status(401).json({ message: 'failed', data: `There's a problem saving payin in analytics history. Please contact customer support for more details` })
