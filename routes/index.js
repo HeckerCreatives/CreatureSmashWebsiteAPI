@@ -11,6 +11,7 @@ const routers = app => {
     app.use("/picuploads", require('./picuploads'))
     app.use("/staffuser", require("./Staffuser"))
     app.use("/maintenance", require("./maintenance"))
+    app.use("/payin", require("./payin"))
 }
 
 module.exports = routers

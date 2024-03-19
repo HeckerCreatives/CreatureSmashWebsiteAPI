@@ -131,6 +131,10 @@ exports.getplayerinventoryforadmin = async (req, res) => {
     }
 
     const creatures = await Inventory.find({owner: playerid, rank: rank})
+    .populate({
+        path: "from",
+        select: "username -_id"
+    })
     .skip(pageOptions.page * pageOptions.limit)
     .limit(pageOptions.limit)
     .sort({'createdAt': -1})
@@ -156,7 +160,8 @@ exports.getplayerinventoryforadmin = async (req, res) => {
     const data = {
         bronze: [],
         silver: [],
-        gold: []
+        gold: [],
+        totalPages: pages
     }
 
     creatures.forEach(datacreatures => {

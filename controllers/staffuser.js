@@ -80,7 +80,30 @@ exports.getsadashboard = async(req, res) => {
 
     data["registered"] = usercount
 
-    data["payin"] = 0
+    const payinpipline = [
+        {
+            $match: {
+                type: "fiatbalance"
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: "$amount" }
+            }
+        }
+    ]
+    const payin = await Analytics.aggregate(payinpipline)
+    .catch(err => {
+
+        console.log(`There's a problem getting payin aggregate for ${username} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: `There's a problem with the server. Please try again later. Error: ${err}` })
+    })
+
+    data["payin"] = payin.length > 0 ? payin[0].totalAmount : 0
+
+    
     data["payout"] = 0
     data["payoutcommission"] = 0
     data["payoutgame"] = 0
