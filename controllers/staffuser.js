@@ -90,12 +90,12 @@ exports.getsadashboard = async(req, res) => {
 
 exports.banunbanuser = async (req, res) => {
     const {id, username} = req.user
-    const {status, userid} = req.body
+    const {status, staffusername} = req.body
 
-    await Staffusers.findOneAndUpdate({_id: new mongoose.Types.ObjectId(userid)}, {status: status})
+    await Staffusers.findOneAndUpdate({username: staffusername}, {status: status})
     .catch(err => {
 
-        console.log(`There's a problem banning or unbanning user for ${username}, player: ${userid}, status: ${status} Error: ${err}`)
+        console.log(`There's a problem banning or unbanning user for ${username}, player: ${staffusername}, status: ${status} Error: ${err}`)
 
         return res.status(400).json({ message: "bad-request", data: "There's a problem getting your user details. Please contact customer support." })
     })

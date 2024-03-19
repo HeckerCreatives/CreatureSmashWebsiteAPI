@@ -155,6 +155,33 @@ exports.getplayerlist = async (req, res) => {
         }
     ]
 
+    const userlist = await Users.aggregate(userlistpipeline)
+    .catch(err => {
+
+        console.log(`There's a problem getting users list for ${username} Error: ${err}`)
+
+        return res.status(400).json({ message: "bad-request", data: "There's a problem getting you user details. Please contact customer support." })
+    })
+
+    const data = {
+        totalPages: Math.ceil(userlist[0].totalCount[0].total / pageOptions.limit),
+        userlist: []
+    }
+
+    userlist[0].data.forEach(value => {
+        const {username, status, createdAt, email, referralUsername} = value
+
+        data["userlist"].push(
+            {
+                username: username,
+                email: email,
+                referralUsername: referralUsername,
+                status: status,
+                createdAt: createdAt
+            }
+        )
+    })
+
     return res.json({message: "success", data: data})
 }
 
@@ -171,4 +198,9 @@ exports.banunbanuser = async (req, res) => {
     })
 
     return res.json({message: "success"})
+}
+
+exports.getplayerwalletforadmin = async (req, res) => {
+    // const {id, username} = req.user
+    // const {username} = 
 }
