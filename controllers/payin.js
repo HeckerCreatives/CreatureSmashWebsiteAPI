@@ -211,7 +211,7 @@ exports.processpayin = async (req, res) => {
             return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
         })
 
-        const wallethistoryadd = await addwallethistory(playerid, "fiatbalance", payinvalue)
+        const wallethistoryadd = await addwallethistory(playerid, "fiatbalance", payinvalue, id)
 
         if (wallethistoryadd != "success"){
             return res.status(401).json({ message: 'failed', data: `There's a problem saving payin in wallet history. Please contact customer support for more details` })

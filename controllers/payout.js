@@ -310,7 +310,7 @@ exports.processpayout = async (req, res) => {
         })
     }
     else{
-        const wallethistoryadd = await addwallethistory(playerid, wallettype, payoutvalue)
+        const wallethistoryadd = await addwallethistory(playerid, wallettype, payoutvalue, id)
 
         if (wallethistoryadd != "success"){
             return res.status(401).json({ message: 'failed', data: `There's a problem saving payin in wallet history. Please contact customer support for more details` })
