@@ -132,7 +132,7 @@ exports.getplayerinventoryforadmin = async (req, res) => {
 
     const creatures = await Inventory.find({owner: playerid, rank: rank})
     .populate({
-        path: "from",
+        path: "owner",
         select: "username -_id"
     })
     .skip(pageOptions.page * pageOptions.limit)
