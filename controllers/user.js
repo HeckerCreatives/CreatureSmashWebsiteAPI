@@ -93,7 +93,7 @@ exports.updateuserprofile = async (req, res) => {
         return res.status(400).json({ message: "bad-request", data: "Please complete the form before updating!." })
     }
 
-    await Userdetails.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {firstname: firstname, lastname: lastname, address: address, city: city, country: country, postalcode: postalcode})
+    await Userdetails.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {firstname: firstname, lastname: lastname, address: address, city: city, country: country, postalcode: postalcode, paymentmethod: paymentmethod, accountnumber: accountnumber})
     .catch(err => {
 
         console.log(`There's a problem saving user details for ${username} Error: ${err}`)
