@@ -35,6 +35,8 @@ exports.getuserdetails = async (req, res) => {
         city: details.city,
         country: details.country,
         postalcode: details.postalcode,
+        paymentmethod: details.paymentmethod,
+        accountnumber: details.accountnumber,
         profilepicture: details.profilepicture
     }
 
@@ -85,9 +87,9 @@ exports.changepassworduserforadmin = async (req, res) => {
 
 exports.updateuserprofile = async (req, res) => {
     const {id, username} = req.user
-    const {firstname, lastname, address, city, country, postalcode} = req.body
+    const {firstname, lastname, address, city, country, postalcode, paymentmethod, accountnumber} = req.body
 
-    if (firstname == "" || lastname == "" || address == "" || city == "" || country == "" || postalcode == ""){
+    if (firstname == "" || lastname == "" || address == "" || city == "" || country == "" || postalcode == "" || paymentmethod == "" || accountnumber == ""){
         return res.status(400).json({ message: "bad-request", data: "Please complete the form before updating!." })
     }
 

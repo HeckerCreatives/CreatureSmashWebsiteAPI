@@ -104,21 +104,55 @@ exports.getpayoutlist = async (req, res) => {
         limit: parseInt(limit) || 10
     }
 
-    const payoutlist = await Payout.find({status: "processing", type: type})
-    .populate({
-        path: "owner processby",
-        select: "username _id"
-    })
-    .skip(pageOptions.page * pageOptions.limit)
-    .limit(pageOptions.limit)
-    .sort({'createdAt': -1})
-    .then(data => data)
-    .catch(err => {
+    const payoutpipelinelist = [
+        {
+            $match: {
+                status: "processing"
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "userinfo"
+            }
+        },
+        {
+            $unwind: "$userinfo"
+        },
+        {
+            $lookup: {
+                from: "userdetails",
+                localField: "owner",
+                foreignField: "owner",
+                as: "userdetails"
+            }
+        },
+        {
+            $unwind: "$userdetails"
+        },
+        {
+            $project: {
+                _id: 1,
+                status: 1,
+                value: 1,
+                type: 1,
+                username: "$userinfo.username",
+                userid: "$userinfo._id",
+                paymentmethod: "$userdetails.paymentmethod",
+                accountnumber: "$userdetails.accountnumber"
+            }
+        },
+        {
+            $skip: pageOptions.page * pageOptions.limit
+        },
+        {
+            $limit: pageOptions.limit
+        }
+    ]
 
-        console.log(`Failed to get payout list data for ${username}, error: ${err}`)
-
-        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
-    })
+    const payoutlist = await Payout.aggregate(payoutpipelinelist)
 
     const totalPages = await Payout.countDocuments({status: "processing", type: type})
     .then(data => data)
