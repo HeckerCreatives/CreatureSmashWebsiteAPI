@@ -107,7 +107,8 @@ exports.getpayoutlist = async (req, res) => {
     const payoutpipelinelist = [
         {
             $match: {
-                status: "processing"
+                status: "processing",
+                type: type
             }
         },
         {
@@ -115,11 +116,11 @@ exports.getpayoutlist = async (req, res) => {
                 from: "users",
                 localField: "owner",
                 foreignField: "_id",
-                as: "userinfo"
+                as: "ownerinfo"
             }
         },
         {
-            $unwind: "$userinfo"
+            $unwind: "$ownerinfo"
         },
         {
             $lookup: {
@@ -138,8 +139,8 @@ exports.getpayoutlist = async (req, res) => {
                 status: 1,
                 value: 1,
                 type: 1,
-                username: "$userinfo.username",
-                userid: "$userinfo._id",
+                username: "$ownerinfo.username",
+                userid: "$ownerinfo._id",
                 paymentmethod: "$userdetails.paymentmethod",
                 accountnumber: "$userdetails.accountnumber"
             }
@@ -171,12 +172,15 @@ exports.getpayoutlist = async (req, res) => {
     }
     
     payoutlist.forEach(valuedata => {
-        const {_id, owner, processby, status, value, type} = valuedata
+        const {_id, owner, status, value, type, username, accountnumber, paymentmethod, userid} = valuedata
 
         data.payoutlist.push({
             id: _id,
             owner: owner,
-            processby: processby != null ? processby : "",
+            username: username,
+            userid: userid,
+            paymentmethod: paymentmethod,
+            accountnumber: accountnumber,
             status: status,
             value: value,
             type: type
