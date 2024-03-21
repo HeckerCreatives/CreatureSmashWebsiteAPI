@@ -161,7 +161,7 @@ exports.getpayouthistorysuperadmin = async (req, res) => {
         limit: parseInt(limit) || 10
     }
 
-    const payoutlist = await Payout.find({type: type})
+    const payoutlist = await Payout.find({type: type, $or: [{status: "done"}, {status: "reject"}]})
     .populate({
         path: "owner processby",
         select: "username _id"
@@ -177,7 +177,7 @@ exports.getpayouthistorysuperadmin = async (req, res) => {
         return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
     })
 
-    const totalPages = await Payout.countDocuments({type: type})
+    const totalPages = await Payout.countDocuments({type: type, $or: [{status: "done"}, {status: "reject"}]})
     .then(data => data)
     .catch(err => {
 
@@ -218,7 +218,7 @@ exports.getpayouthistoryadmin = async (req, res) => {
         limit: parseInt(limit) || 10
     }
 
-    const payoutlist = await Payout.find({type: type, processby: new mongoose.Types.ObjectId(id)})
+    const payoutlist = await Payout.find({type: type, processby: new mongoose.Types.ObjectId(id), $or: [{status: "done"}, {status: "reject"}]})
     .populate({
         path: "owner processby",
         select: "username _id"
@@ -234,7 +234,7 @@ exports.getpayouthistoryadmin = async (req, res) => {
         return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
     })
 
-    const totalPages = await Payout.countDocuments({type: type, processby: new mongoose.Types.ObjectId(id)})
+    const totalPages = await Payout.countDocuments({type: type, processby: new mongoose.Types.ObjectId(id), $or: [{status: "done"}, {status: "reject"}]})
     .then(data => data)
     .catch(err => {
 

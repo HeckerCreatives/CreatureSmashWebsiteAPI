@@ -69,7 +69,7 @@ exports.getpayinhistorysuperadmin = async (req, res) => {
         limit: parseInt(limit) || 10
     }
 
-    const payinhistory = await Payin.find()
+    const payinhistory = await Payin.find({$or: [{status: "done"}, {status: "reject"}]})
     .populate({
         path: "owner processby",
         select: "username -_id"
@@ -85,7 +85,7 @@ exports.getpayinhistorysuperadmin = async (req, res) => {
         return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
     })
 
-    const totalPages = await Payin.countDocuments()
+    const totalPages = await Payin.countDocuments({$or: [{status: "done"}, {status: "reject"}]})
     .then(data => data)
     .catch(err => {
 
@@ -124,7 +124,7 @@ exports.getpayinhistoryadmin = async (req, res) => {
         limit: parseInt(limit) || 10
     }
 
-    const payinhistory = await Payin.find({processby: new mongoose.Types.ObjectId(id)})
+    const payinhistory = await Payin.find({processby: new mongoose.Types.ObjectId(id), $or: [{status: "done"}, {status: "reject"}]})
     .populate({
         path: "owner processby",
         select: "username -_id"
@@ -140,7 +140,7 @@ exports.getpayinhistoryadmin = async (req, res) => {
         return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
     })
 
-    const totalPages = await Payin.countDocuments({processby: new mongoose.Types.ObjectId(id)})
+    const totalPages = await Payin.countDocuments({processby: new mongoose.Types.ObjectId(id), $or: [{status: "done"}, {status: "reject"}]})
     .then(data => data)
     .catch(err => {
 
