@@ -341,4 +341,6 @@ exports.sendfiattoplayer = async (req, res) => {
     if (analyticsadd != "success"){
         return res.status(401).json({ message: 'failed', data: `There's a problem saving payin in analytics history. Please contact customer support for more details` })
     }
+
+    return res.json({message: "success"})
 }
