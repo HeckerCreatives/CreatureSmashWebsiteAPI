@@ -106,51 +106,102 @@ exports.getplayerwallethistoryforadmin = async (req, res) => {
         limit: parseInt(limit) || 10
     };
     
-    const wallethistorypipeline = [
-        {
-            $match: {
-                owner: new mongoose.Types.ObjectId(playerid), 
-                type: type
+    let wallethistorypipeline
+
+    if (type == "fiatbalance" || type == "gamebalance"){
+        wallethistorypipeline = [
+            {
+                $match: {
+                    owner: new mongoose.Types.ObjectId(playerid), 
+                    type: type
+                }
+            },
+            {
+                $lookup: {
+                    from: "staffusers",
+                    localField: "from",
+                    foreignField: "_id",
+                    as: "staffuserinfo"
+                }
+            },
+            {
+                $unwind: "$staffuserinfo"
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "_id",
+                    as: "userinfo"
+                }
+            },
+            {
+                $unwind: "$userinfo"
+            },
+            {
+                $project: {
+                    type: 1,
+                    amount: 1,
+                    fromusername: "$staffuserinfo.username",
+                    username: "$userinfo.username",
+                    createdAt: 1
+                }
+            },
+            {
+                $skip: pageOptions.page * pageOptions.limit
+            },
+            {
+                $limit: pageOptions.limit
             }
-        },
-        {
-            $lookup: {
-                from: "staffusers",
-                localField: "from",
-                foreignField: "_id",
-                as: "staffuserinfo"
+        ]
+    }
+    else{
+        wallethistorypipeline = [
+            {
+                $match: {
+                    owner: new mongoose.Types.ObjectId(playerid), 
+                    type: type
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "from",
+                    foreignField: "_id",
+                    as: "fromuserinfo"
+                }
+            },
+            {
+                $unwind: "$fromuserinfo"
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "_id",
+                    as: "userinfo"
+                }
+            },
+            {
+                $unwind: "$userinfo"
+            },
+            {
+                $project: {
+                    type: 1,
+                    amount: 1,
+                    fromusername: "$fromuserinfo.username",
+                    username: "$userinfo.username",
+                    createdAt: 1
+                }
+            },
+            {
+                $skip: pageOptions.page * pageOptions.limit
+            },
+            {
+                $limit: pageOptions.limit
             }
-        },
-        {
-            $unwind: "$staffuserinfo"
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "owner",
-                foreignField: "_id",
-                as: "userinfo"
-            }
-        },
-        {
-            $unwind: "$userinfo"
-        },
-        {
-            $project: {
-                type: 1,
-                amount: 1,
-                fromusername: "$staffuserinfo.username",
-                username: "$userinfo.username",
-                createdAt: 1
-            }
-        },
-        {
-            $skip: pageOptions.page * pageOptions.limit
-        },
-        {
-            $limit: pageOptions.limit
-        }
-    ]
+        ]
+    }
 
     const history = await Wallethistory.aggregate(wallethistorypipeline)
     .catch(err => {
@@ -178,8 +229,6 @@ exports.getplayerwallethistoryforadmin = async (req, res) => {
 
     history.forEach(historydata => {
         const {username, type, amount, fromusername, createdAt} = historydata
-
-        console.log(historydata)
 
         data.history.push({
             username: username,
