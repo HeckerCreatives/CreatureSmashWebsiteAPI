@@ -12,11 +12,11 @@ exports.requestpayout = async (req, res) => {
     const maintenance = await checkmaintenance("payout")
 
     if (maintenance == "maintenance"){
-        return res.status(400).json({ message: "bad-request", data: "The payout is currently under going maintenance. Please bear with us to give you the best support." })
+        return res.status(400).json({ message: "failed", data: "The payout is currently under going maintenance. Please bear with us to give you the best support." })
     }
 
     else if (maintenance != "success"){
-        return res.status(400).json({ message: "bad-request", data: "There's a problem requesting your payout! Please try again later." })
+        return res.status(400).json({ message: "failed", data: "There's a problem requesting your payout! Please try again later." })
     }
 
     const wallet = await Userwallets.findOne({owner: new mongoose.Types.ObjectId(id), type: type})
