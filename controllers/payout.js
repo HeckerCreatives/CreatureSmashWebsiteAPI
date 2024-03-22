@@ -12,7 +12,7 @@ exports.requestpayout = async (req, res) => {
     const maintenance = await checkmaintenance("payout")
 
     if (maintenance == "maintenance"){
-        return res.status(400).json({ message: "failed", data: "The payout is currently under going maintenance. Please bear with us to give you the best support." })
+        return res.status(400).json({ message: "failed", data: "The payout is currently not available. Please bear with us to give you the best support." })
     }
 
     else if (maintenance != "success"){
