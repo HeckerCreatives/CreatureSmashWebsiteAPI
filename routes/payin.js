@@ -1,5 +1,5 @@
 const router = require("express").Router()
-const { getpayinlist, processpayin, getpayinhistorysuperadmin, requestpayin, getpayinhistoryplayer, getpayinhistoryadmin } = require("../controllers/payin")
+const { getpayinlist, processpayin, getpayinhistorysuperadmin, requestpayin, getpayinhistoryplayer, getpayinhistoryadmin, sendfiattoplayer } = require("../controllers/payin")
 const { protectsuperadmin, protectplayer, protectadmin } = require("../middleware/middleware")
 
 router
@@ -11,5 +11,7 @@ router
     .post("/processpayin", protectsuperadmin, processpayin)
     .post("/requestpayin", protectplayer, requestpayin)
     .post("/processpayinadmin", protectadmin, processpayin)
+    .post("/superadminsendfiatplayer", protectsuperadmin, sendfiattoplayer)
+    .post("/adminsendfiatplayer", protectadmin, sendfiattoplayer)
 
 module.exports = router;

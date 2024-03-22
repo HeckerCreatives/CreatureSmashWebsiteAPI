@@ -1,8 +1,10 @@
 const { default: mongoose } = require("mongoose")
 const Payin = require("../models/Payin")
 const Userwallets = require("../models/Userwallets")
+const Users = require("../models/Users")
 const { addwallethistory } = require("../utils/wallethistorytools")
 const { addanalytics } = require("../utils/analyticstools")
+const { createpayin } = require("../utils/payintools")
 
 exports.getpayinlist = async (req, res) => {
     const {id, username} = req.user
@@ -295,4 +297,48 @@ exports.getpayinhistoryplayer = async (req, res) => {
     })
 
     return res.json({message: "success", data: data})
+}
+
+exports.sendfiattoplayer = async (req, res) => {
+    const {id, username} = req.user
+    const {playerusername, amount} = req.body
+
+    const player = await Users.findOne({username: playerusername})
+    .then(data => data)
+    .catch(err => {
+
+        console.log(`Failed to get player data for ${username}, player: ${playerusername} error: ${err}`)
+
+        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
+    })
+
+    if (!player){
+        return res.status(401).json({ message: 'failed', data: `The account does not exist! Please enter the correct username` })
+    }
+
+    await Userwallets.findOneAndUpdate({owner: new mongoose.Types.ObjectId(player._id)}, {$inc: {amount: amount}})
+    .catch(err => {
+
+        console.log(`Failed to add wallet fiat player data for ${username}, player: ${playerusername}, amount: ${amount}, error: ${err}`)
+
+        return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
+    })
+
+    const addpayin = await createpayin(player._id, amount, id)
+
+    if (addpayin != "success"){
+        return res.status(401).json({ message: 'failed', data: `There's a problem creating payin in wallet history. Please contact customer support for more details` })
+    }
+    
+    const wallethistoryadd = await addwallethistory(player._id, "fiatbalance", amount, id)
+
+    if (wallethistoryadd != "success"){
+        return res.status(401).json({ message: 'failed', data: `There's a problem saving payin in wallet history. Please contact customer support for more details` })
+    }
+
+    const analyticsadd = await addanalytics(player._id, "payinfiatbalance", `Add balance to user ${player._id} with a value of ${amount} processed by ${username}`, amount)
+
+    if (analyticsadd != "success"){
+        return res.status(401).json({ message: 'failed', data: `There's a problem saving payin in analytics history. Please contact customer support for more details` })
+    }
 }

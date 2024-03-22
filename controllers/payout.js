@@ -3,10 +3,21 @@ const Payout = require("../models/Payout")
 const Userwallets = require("../models/Userwallets")
 const { addwallethistory } = require("../utils/wallethistorytools")
 const { addanalytics } = require("../utils/analyticstools")
+const { checkmaintenance } = require("../utils/maintenancetools")
 
 exports.requestpayout = async (req, res) => {
     const {id, username} = req.user
     const {type, payoutvalue} = req.body
+
+    const maintenance = await checkmaintenance("payout")
+
+    if (maintenance == "maintenance"){
+        return res.status(400).json({ message: "bad-request", data: "The payout is currently under going maintenance. Please bear with us to give you the best support." })
+    }
+
+    else if (maintenance != "success"){
+        return res.status(400).json({ message: "bad-request", data: "There's a problem requesting your payout! Please try again later." })
+    }
 
     const wallet = await Userwallets.findOne({owner: new mongoose.Types.ObjectId(id), type: type})
     .then(data => data)
