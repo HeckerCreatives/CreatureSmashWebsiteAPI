@@ -324,7 +324,7 @@ exports.sendfiattoplayer = async (req, res) => {
         return res.status(401).json({ message: 'failed', data: `There's a problem with your account. Please contact customer support for more details` })
     })
 
-    const addpayin = await createpayin(player._id, amount, id)
+    const addpayin = await createpayin(player._id, amount, id, "done")
 
     if (addpayin != "success"){
         return res.status(401).json({ message: 'failed', data: `There's a problem creating payin in wallet history. Please contact customer support for more details` })
